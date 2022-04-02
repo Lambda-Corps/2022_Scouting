@@ -3,3 +3,4 @@ django-bootstrap4
 django-tables2
 urllib3
 certifi
+django-crispy-forms

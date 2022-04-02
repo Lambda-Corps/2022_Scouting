@@ -1,0 +1,16 @@
+{% extends 'scout/base.html' %}
+
+{% block title %}
+    Summary - Team {{ team.number }}
+{% endblock %}
+
+{% block breadcrumb %}
+    <li class="breadcrumb-item"><a href="{% url 'scout:scout_home' %}">Home</a></li>
+    <li class="breadcrumb-item"><a href="{% url 'scout:teams' %}">Teams</a></li>
+	<li class="breadcrumb-item active">Team {{team.number }}</li>
+{% endblock %}
+
+{% block content %}
+    <h1>{{team}}</h1>
+    {{team.pit_scout}}
+{% endblock %}
