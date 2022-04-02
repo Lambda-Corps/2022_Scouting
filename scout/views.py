@@ -15,7 +15,7 @@ def public_view(request):
 def teams(request):
     return render(request, 'scout/teams.html')
 
-def update_event(request):
+def update_event():
     url = "https://www.thebluealliance.com/api/v3/event/2020chcmp/teams/simple"
     accept_header = 'application/json'
     auth_key = 'BJG4S2d2nkSkXikztbXHWBL8riwfb4ghAhUIXJ5dezxxhBpvC8ngqrekG2kjF5JV'
@@ -36,3 +36,12 @@ def update_event(request):
     # Team.save()
 
     return HttpResponse(teams)
+
+def update_event_json():
+    teams = {}
+    with open("2022chcmp_teams.json") as file:
+        teams = json.load(file)
+        for team in teams:
+            Team.objects.create(name=team['nickname'], number=team['team_number'], frc_key=team['key'])
+
+    
