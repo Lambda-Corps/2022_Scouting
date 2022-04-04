@@ -6,12 +6,10 @@ from django.urls import reverse, reverse_lazy
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 
-import urllib3
-import certifi
-import json
-
 from .models import Team, Robot, MatchResult
 from .tables import TeamTable, MatchResultTable
+
+from . import utils
 
 # Create your views here.
 def public_view(request):
@@ -24,36 +22,7 @@ def teams(request):
     RequestConfig(request).configure(table)
     return render(request, 'scout/teams.html', {'table': table})
 
-@login_required
-def update_event():
-    url = "https://www.thebluealliance.com/api/v3/event/2022chcmp/teams/simple"
-    accept_header = 'application/json'
-    auth_key = 'BJG4S2d2nkSkXikztbXHWBL8riwfb4ghAhUIXJ5dezxxhBpvC8ngqrekG2kjF5JV'
-    headers = {
-        'accept' : 'application/json',
-        'X-TBA-Auth-Key' : auth_key,
-        'User-Agent' : '1895_Scouter'
-    }
 
-    http = urllib3.PoolManager(ca_certs=certifi.where())
-    req = http.request('GET', url, headers)
-
-    teams = json.loads(req.data.decode('UTF-8'))
-
-    for team in teams:
-        Team.objects.create(name=team['nickname'], number=team['team_number'], frc_key=team['key'])
-
-    # Team.save()
-
-    return HttpResponse(teams)
-
-@login_required
-def update_event_json():
-    teams = {}
-    with open("2022chcmp_teams.json") as file:
-        teams = json.load(file)
-        for team in teams:
-            Team.objects.create(name=team['nickname'], number=team['team_number'], frc_key=team['key'])\
 
 
 def team_summary(request, number):
@@ -88,3 +57,69 @@ def matches(request):
     table = MatchResultTable(MatchResult.objects.all())
     RequestConfig(request).configure(table)
     return render(request, 'scout/teams.html', {'table': table})
+
+
+def qualifier_predictor(request, number):
+    match = utils.get_qualifier_match(number)
+
+    if match == None:
+        return HttpResponse(f"No information found for match: {number}") 
+
+    # We the match
+    teams = {}
+    match_score = {'auto_points': '2', 'teleop_points': '10', 'endgame_points': '15'}
+
+    team1 = {'number' : match['alliances']['red']['team_keys'][0],
+             'auto_points' : match_score['auto_points'],
+             'teleop_points' : match_score['teleop_points'],
+             'endgame_points' : match_score['endgame_points']
+
+    }
+    team2 = {'number' : match['alliances']['red']['team_keys'][1],
+             'auto_points' : match_score['auto_points'],
+             'teleop_points' : match_score['teleop_points'],
+             'endgame_points' : match_score['endgame_points']
+
+    }
+    team3 = {'number' : match['alliances']['red']['team_keys'][2],
+             'auto_points' : match_score['auto_points'],
+             'teleop_points' : match_score['teleop_points'],
+             'endgame_points' : match_score['endgame_points']
+
+    }
+    team4 = {'number' : match['alliances']['red']['team_keys'][0],
+             'auto_points' : match_score['auto_points'],
+             'teleop_points' : match_score['teleop_points'],
+             'endgame_points' : match_score['endgame_points']
+
+    }
+    team5 = {'number' : match['alliances']['red']['team_keys'][1],
+             'auto_points' : match_score['auto_points'],
+             'teleop_points' : match_score['teleop_points'],
+             'endgame_points' : match_score['endgame_points']
+
+    }
+    team6 = {'number' : match['alliances']['red']['team_keys'][2],
+             'auto_points' : match_score['auto_points'],
+             'teleop_points' : match_score['teleop_points'],
+             'endgame_points' : match_score['endgame_points']
+
+    }
+ 
+    
+
+    teams['r1'] = team1
+    teams['r2'] = team2
+    teams['r3'] = team3
+    teams['b1'] = team4
+    teams['b2'] = team5
+    teams['b3'] = team6
+
+    # RequestConfig(request).configure(teams)
+    return render(request, 'scout/predictor_table.html', {'teams': teams})
+
+
+    
+
+
+    
