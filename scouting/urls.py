@@ -23,5 +23,6 @@ urlpatterns = [
     path('scout/', include('scout.urls')),
     path('admin/', admin.site.urls),
     path('', RedirectView.as_view(url='public')),
-    path('public/', public_view, name='public')
+    path('public/', public_view, name='public'),
+    path('accounts/', include('django.contrib.auth.urls')),
 ]

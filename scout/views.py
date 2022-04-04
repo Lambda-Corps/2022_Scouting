@@ -3,6 +3,8 @@ from django.http import HttpResponse, request
 from django_tables2 import RequestConfig
 from django.views.generic import DetailView, FormView, CreateView, UpdateView, ListView
 from django.urls import reverse, reverse_lazy
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 import urllib3
 import certifi
@@ -22,7 +24,7 @@ def teams(request):
     RequestConfig(request).configure(table)
     return render(request, 'scout/teams.html', {'table': table})
 
-
+@login_required
 def update_event():
     url = "https://www.thebluealliance.com/api/v3/event/2022chcmp/teams/simple"
     accept_header = 'application/json'
@@ -45,7 +47,7 @@ def update_event():
 
     return HttpResponse(teams)
 
-
+@login_required
 def update_event_json():
     teams = {}
     with open("2022chcmp_teams.json") as file:
@@ -63,14 +65,15 @@ def team_summary(request, number):
     return render(request, 'scout/team_summary.html', {'team': team})
 
 
-class RobotCreateView(CreateView):
+class RobotCreateView(LoginRequiredMixin, CreateView):
     model = Robot
     fields = "__all__"
 
 
-class MatchCreateView(CreateView):
+class MatchCreateView(LoginRequiredMixin, CreateView):
     model = MatchResult
     fields = "__all__"
+
 
 class MatchResultListView(ListView):
     model = MatchResult
