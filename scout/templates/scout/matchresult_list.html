@@ -1,0 +1,17 @@
+{% extends 'scout/base.html' %}
+
+{% block breadcrumb %}
+	<li class="breadcrumb-item"><a href="{% url 'scout:scout_home' %}">Home</a></li>
+	<li class="breadcrumb-item active">Matches</li>
+{% endblock %}
+
+{% block content %}
+<h1>List of all Matches (list view)</h1>
+<ul>
+    {% for result in match_result_list %}
+        <li>
+            {{result}}
+        </li>
+    {% endfor %}
+</ul>
+{% endblock %}

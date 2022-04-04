@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.http import HttpResponse, request
 from django_tables2 import RequestConfig
-from django.views.generic import DetailView, FormView, CreateView, UpdateView
+from django.views.generic import DetailView, FormView, CreateView, UpdateView, ListView
 from django.urls import reverse, reverse_lazy
 
 import urllib3
@@ -9,7 +9,7 @@ import certifi
 import json
 
 from .models import Team, Robot, MatchResult
-from .tables import TeamTable
+from .tables import TeamTable, MatchResultTable
 
 # Create your views here.
 def public_view(request):
@@ -71,3 +71,17 @@ class RobotCreateView(CreateView):
 class MatchCreateView(CreateView):
     model = MatchResult
     fields = "__all__"
+
+class MatchResultListView(ListView):
+    model = MatchResult
+    fields = "__all__"
+    # queryset = MatchResult.objects.all()
+    # queryset = MatchResult.objects.order_by('match_number')
+
+    context_object_name = "match_result_list"
+
+
+def matches(request):
+    table = MatchResultTable(MatchResult.objects.all())
+    RequestConfig(request).configure(table)
+    return render(request, 'scout/teams.html', {'table': table})

@@ -7,7 +7,7 @@ class Team(models.Model):
     number = models.IntegerField(primary_key=True, unique=True)
     frc_key = models.CharField(max_length=10, unique=True)
 
-    robot_report = models.OneToOneField('Robot', null=True, on_delete=models.CASCADE, related_name='team')
+    robot_report = models.OneToOneField('Robot', null=True, on_delete=models.CASCADE, related_name='team', verbose_name="Robot")
 
     def __str__(self):
         return f"Team {self.number}: {self.name}"
@@ -24,7 +24,7 @@ class Robot(models.Model):
     HIGHBAR = 'High Bar'
     TRAVERSE = 'Traversal Bar'
 
-    frc_team = models.OneToOneField(Team, related_name='robot', null=True, on_delete=models.CASCADE)
+    frc_team = models.OneToOneField(Team, related_name='robot', null=True, on_delete=models.CASCADE,verbose_name="Team")
 
     tele_goal = ((LOW, 'Low'), (HIGH, 'High'), (BOTH, 'Both'), (NONE, 'None'))
     climb_level = ((LOWBAR, 'Low Bar'), (MIDBAR, 'Middle Bar'), (HIGHBAR, 'High Bar'), (TRAVERSE, 'Traversal Bar'), (NONE, 'No Climb'))
@@ -82,21 +82,22 @@ class MatchResult(models.Model):
     # Auto taxi (T/F)
     auto_taxi = models.BooleanField(default=False)
     # Auto ball count (int field)
-    auto_ball = models.IntegerField(default=0, max_length=1)
+    auto_scored = models.IntegerField(default=0)
     # Auto target (high/low/none)
     auto_target = models.CharField(choices=auto_target_field, default=NONE, max_length=13)
     
     # Teleop target (high/low/both/none)
     tele_target = models.CharField(choices=tele_target_field, default=NONE, max_length=13)
     # Teleop cargo count (int field)
-    tele_cargo = models.IntegerField(default=0, max_length=2)
+    tele_scored = models.IntegerField(default=0)
+
     # Teleop shot distances (close only, far only, anywhere, no shooting)
-    tele_distance = models.CharField(choices=tele_distance_field, default=NONE, max_length=13)
+    # tele_distance = models.CharField(choices=tele_distance_field, default=NONE, max_length=13)
 
     # Climb location (low, mid, high, traverse, none)
     climb_height = models.CharField(choices=climb_height_field, default=NONE, max_length=13)
-    # climb time (int field)
-    climb_time = models.IntegerField(default=0, max_length=2)
+    # Did they attempt to climb
+    climb_attempted = models.BooleanField(default=False)
 
     # Driver skill rating (1 - 5)
     driver_rating = models.CharField(choices=driver_rating_field, default=ONE, max_length=13)
@@ -105,3 +106,6 @@ class MatchResult(models.Model):
 
     def get_absolute_url(self):
         return reverse('scout:team_summary', kwargs={'number': self.frc_team.number})
+
+    def __str__(self):
+        return f"Match Number {self.match_number}: Taxi: {self.auto_taxi}"
