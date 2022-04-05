@@ -63,6 +63,7 @@ class MatchResult(models.Model):
     CLIMBMID = 'Mid Bar'
     CLIMBHIGH = 'High Bar'
     TRAVERSE = 'Traversal Bar'
+    CLIMBFAIL ='Failed'
 
     ONE = 'Really Bad'
     TWO = 'Bad'
@@ -73,7 +74,8 @@ class MatchResult(models.Model):
     auto_target_field = ((AUTOHIGH, 'High Goal'), (AUTOLOW, 'Low Goal'), (NONE, 'No Auto'))
     tele_target_field = ((TELEHIGH, 'High Goal'), (TELELOW, 'Low Goal'), (NONE, 'No Teleop Shooting'))
     tele_distance_field = ((TELECLOSE, 'Inside Tarmac Only'), (TELEFAR, 'Outside Tarmac Only'), (TELEANYWHERE, 'Anywhere'), (NONE, 'N/A'))
-    climb_height_field = ((CLIMBLOW, 'Low Bar'), (CLIMBMID, 'Mid Bar'), (CLIMBHIGH, 'High Bar'), (TRAVERSE, 'Traversal Bar'), (NONE, 'No Climb'))
+    # climb_height_field = ((CLIMBLOW, 4), (CLIMBMID, 6), (CLIMBHIGH, 10), (TRAVERSE, 15), (CLIMBFAIL, 0))
+    climb_height_field = ((4, CLIMBLOW), (6, CLIMBMID), (10, CLIMBHIGH), (15, TRAVERSE), (0, CLIMBFAIL))
     driver_rating_field = ((ONE, 'Really Bad'), (TWO, 'Bad'), (THREE, 'Moderate'), (FOUR, 'Good'), (FIVE, 'Really Good'))
 
     frc_team = models.ForeignKey(Team, related_name='matches', null=True , on_delete=models.CASCADE)
@@ -87,15 +89,15 @@ class MatchResult(models.Model):
     auto_target = models.CharField(choices=auto_target_field, default=NONE, max_length=13)
     
     # Teleop target (high/low/both/none)
-    tele_target = models.CharField(choices=tele_target_field, default=NONE, max_length=13)
+    tele_low = models.PositiveSmallIntegerField(default=0)
     # Teleop cargo count (int field)
-    tele_scored = models.IntegerField(default=0)
+    tele_high = models.IntegerField(default=0)
 
     # Teleop shot distances (close only, far only, anywhere, no shooting)
     # tele_distance = models.CharField(choices=tele_distance_field, default=NONE, max_length=13)
 
     # Climb location (low, mid, high, traverse, none)
-    climb_height = models.CharField(choices=climb_height_field, default=NONE, max_length=13)
+    climb_points = models.PositiveSmallIntegerField(choices=climb_height_field, default=0)
     # Did they attempt to climb
     climb_attempted = models.BooleanField(default=False)
 

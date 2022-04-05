@@ -11,6 +11,8 @@ from .tables import TeamTable, MatchResultTable
 
 from . import utils
 
+import random
+
 # Create your views here.
 def public_view(request):
     # return HttpResponse("Public View")
@@ -73,7 +75,6 @@ def qualifier_predictor(request, number):
              'auto_points' : match_score['auto_points'],
              'teleop_points' : match_score['teleop_points'],
              'endgame_points' : match_score['endgame_points']
-
     }
     team2 = {'number' : match['alliances']['red']['team_keys'][1],
              'auto_points' : match_score['auto_points'],
@@ -119,7 +120,25 @@ def qualifier_predictor(request, number):
     return render(request, 'scout/predictor_table.html', {'teams': teams})
 
 
-    
+def match_preview(request, type, number):
+    match = utils.get_qualifier_match(number) if type is "q" else utils.get_playoff_match(type, number)
 
+    if match is None:
+        return HttpResponse(f"No match data found for match: {type} {number} ")
 
+    teams = {}
+    team1 = utils.get_team_scoring_prediction(match['alliances']['red']['team_keys'][0])
+    team2 = utils.get_team_scoring_prediction(match['alliances']['red']['team_keys'][1])
+    team3 = utils.get_team_scoring_prediction(match['alliances']['red']['team_keys'][2])
+    team4 = utils.get_team_scoring_prediction(match['alliances']['blue']['team_keys'][0])
+    team5 = utils.get_team_scoring_prediction(match['alliances']['blue']['team_keys'][1])
+    team6 = utils.get_team_scoring_prediction(match['alliances']['blue']['team_keys'][2])
     
+    teams['r1'] = team1
+    teams['r2'] = team2
+    teams['r3'] = team3
+    teams['b1'] = team4
+    teams['b2'] = team5
+    teams['b3'] = team6
+    return render(request, 'scout/match_preview.html', {'teams': teams})
+
