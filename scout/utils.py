@@ -1,4 +1,4 @@
-from .models import Team, MatchResult
+from .models import Team, MatchResult, Robot
 
 import urllib3
 import certifi
@@ -90,7 +90,7 @@ def get_team_scoring_prediction(number):
     except Team.DoesNotExist:
         return {'number': 1, 'auto_points': 1, 'teleop_points': 2, 'endgame_points': 3}
     
-    print(matches)
+    # print(matches)
     match_count = matches.count()
 
     if match_count == 0:
@@ -122,12 +122,37 @@ def get_team_scoring_prediction(number):
                 endgame_total += match.climb_points
         
         # Return the total expected points based on results
-        auto_points = (auto_taxi/match_count) + (auto_cargo/match_count)
-        teleop_points = teleop_cargo / match_count
-        endgame_points = endgame_total / match_count
+        auto_points = round((auto_taxi/match_count) + (auto_cargo/match_count), 2)
+        teleop_points = round(teleop_cargo / match_count, 2)
+        endgame_points = round(endgame_total / match_count, 2)
 
         return {'number': team.number, 'auto_points': auto_points, 'teleop_points': teleop_points, 'endgame_points': endgame_points}
 
+
+def team_match_generator(matches_per_team):
+    # Possible field entries
+    auto_target_field = ['High Goal', 'Low Goal']
+    tele_target_field = ['High Goal', 'Low Goal']
+    climb_height_field = [0, 4, 6, 10, 15]
+    driver_rating_field = [1, 2, 3, 4, 5]
+
+    teams = Team.objects.all()
+
+    for team in teams:
+        for x in range(1, matches_per_team):
+            result = MatchResult(frc_team=team,
+                                match_number=x,
+                                auto_taxi=random.randint(0,1) == 0,
+                                auto_scored=random.randint(0,5),
+                                auto_target=auto_target_field[random.randint(0,1)],
+                                tele_low=random.randint(0,3),
+                                tele_high=random.randint(0,6),
+                                climb_points=climb_height_field[random.randint(0,4)],
+                                climb_attempted=random.randint(0,1)==0,
+                                driver_rating=driver_rating_field[random.randint(0,4)],
+                                comments="Auto-generated Match"
+                                )
+            result.save()
 
 def event_match_generator(number_of_matches):
     # frc_team = models.ForeignKey(Team, related_name='matches', null=True , on_delete=models.CASCADE)
@@ -173,3 +198,27 @@ def get_random_team():
         team_numbers.append(team.number)
 
     return Team.objects.get(number=team_numbers[random.randint(0, len(team_numbers))])
+
+
+def pit_scout_generator():
+    tele_goal = ['Low', 'High', 'Both', 'None']
+    climb_level = ['Low Bar', 'Middle Bar', 'High Bar', 'Traversal Bar', 'No Climb']
+    drive_type_choices = ['WCD', 'Swerve', 'Mechanum', 'KoP Chassis']
+    # frc_team = models.OneToOneField(Team, related_name='robot', null=True, on_delete=models.CASCADE,verbose_name="Team")
+    # auto_points = models.IntegerField(default=0)
+    # drive_type = models.CharField(max_length=45)
+    # target = models.CharField(choices=tele_goal, max_length=11)
+    # climb = models.CharField(choices=climb_level, max_length=13)
+
+    teams = Team.objects.all()
+
+    for team in teams:
+        robot = Robot(
+            frc_team=team,
+            auto_points=random.randint(0,22),
+            drive_type=drive_type_choices[random.randint(0,3)],
+            target=tele_goal[random.randint(0,3)],
+            climb=climb_level[random.randint(0,4)]
+        )
+
+        robot.save()
