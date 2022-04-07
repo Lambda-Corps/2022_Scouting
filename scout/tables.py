@@ -13,7 +13,8 @@ class TeamTable(tables.Table):
 
 
 class MatchResultTable(tables.Table):
-    frc_team = tables.Column(verbose_name="Team")
+    frc_team = tables.LinkColumn('scout:team_summary', args=[A('frc_team.number')], verbose_name="Team")
+    match_number = tables.LinkColumn('scout:edit_match', args=[A('match_number')])
 
     class Meta:
         model = MatchResult

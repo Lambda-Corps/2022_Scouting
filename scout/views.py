@@ -5,6 +5,8 @@ from django.views.generic import DetailView, FormView, CreateView, UpdateView, L
 from django.urls import reverse, reverse_lazy
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.forms import modelformset_factory
+
 
 from .models import Team, Robot, MatchResult
 from .tables import TeamTable, MatchResultTable
@@ -16,7 +18,7 @@ import random
 # Create your views here.
 def public_view(request):
     # return HttpResponse("Public View")
-    return render(request, 'scout/base.html')
+    return render(request, 'scout/public.html')
 
 
 def teams(request):
@@ -30,10 +32,11 @@ def teams(request):
 def team_summary(request, number):
     try:
         team = Team.objects.get(number=number)
+        matches = MatchResultTable(team.matches.all())
     except Team.DoesNotExist:
         return HttpResponse("Team {} not found.".format(number))
-
-    return render(request, 'scout/team_summary.html', {'team': team})
+    RequestConfig(request).configure(matches)
+    return render(request, 'scout/team_summary.html', {'team': team, 'matches': matches})
 
 
 class RobotCreateView(LoginRequiredMixin, CreateView):
@@ -59,6 +62,12 @@ def matches(request):
     table = MatchResultTable(MatchResult.objects.all())
     RequestConfig(request).configure(table)
     return render(request, 'scout/teams.html', {'table': table})
+
+
+def match_summary(request, number):
+    table = MatchResultTable(MatchResult.objects.filter(match_number=number))
+    RequestConfig(request).configure(table)
+    return render(request, 'scout/match_summary.html', {'table': table})
 
 
 def qualifier_predictor(request, number):
@@ -142,3 +151,21 @@ def match_preview(request, type, number):
     teams['b3'] = team6
     return render(request, 'scout/match_preview.html', {'teams': teams})
 
+
+@login_required(login_url='/admin/login')
+def match_add(request, number):
+    matchformset = modelformset_factory(MatchResult, exclude=('id',), min_num=6, extra=0)
+
+    if request.method == 'POST':
+        match_form_set = matchformset(request.POST, request.FILES)
+        if match_form_set.is_valid():
+            match_form_set.save()
+    else:
+        matches = MatchResult.objects.filter(match_number=number)
+
+        if matches.count() == 0:
+            match_form_set = matchformset(queryset=MatchResult.objects.none())
+        else:
+            match_form_set = matchformset(queryset=matches)
+
+    return render(request, 'scout/match_edit.html', {'formset': match_form_set})

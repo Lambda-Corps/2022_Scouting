@@ -1,0 +1,20 @@
+{% extends 'scout/base.html' %}
+
+{% block title %}
+    Home - {{block.super}}
+{% endblock %}
+
+{% block breadcrumb %}
+	<li class="breadcrumb-item active">Home</li>
+{% endblock %}
+
+{% block content %}
+    <h2>Lambda Corps Scouting</h2>
+    <p>Welcome to team 1895 Lambda Corps scouting app! Here you will be able to access all of the data we collect over the course of this competition; such as our pit scouting reports for the teams, our match scouting reports, and our predictions for upcoming matches.</p>
+    <nav>
+        <ul>
+            <li><a class="nav-link" href="{% url 'scout:teams' %}">Teams</a></li>
+            <li><a class="nav-link" href="{% url 'scout:matches' %}">Matches</a></li>
+        </ul>
+    </nav>
+{% endblock %}

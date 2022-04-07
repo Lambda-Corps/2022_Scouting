@@ -10,6 +10,8 @@ urlpatterns = [
     path('teams/<int:number>', views.team_summary, name='team_summary'),
     path('create_robot/', views.RobotCreateView.as_view(), name='create_robot'),
     path('submit_match/', views.MatchCreateView.as_view(), name='submit_match'),
+    path('matches/<int:number>/', views.match_summary, name="match_summary"),
+    path('matches/<int:number>/add/', views.match_add, name="edit_match"),
     # path('predictor/q/<int:number>', views.qualifier_predictor, name='qual_predictor'),
-    path('predictor/<str:type>/<int:number>', views.match_preview, name='match_preview')
+    path('predictor/<str:type>/<int:number>', views.match_preview, name='match_preview'),
 ]

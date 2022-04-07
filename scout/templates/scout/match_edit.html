@@ -1,0 +1,84 @@
+{% extends 'scout/base.html' %}
+{# tutorial/templates/tutorial/people.html #}
+{% load render_table from django_tables2 %}
+{% load bootstrap_formset from bootstrap4 %}
+{% load static %}
+
+
+{% block title %}
+  List of Matches - {{ block.super }}
+{% endblock %}
+
+{% block breadcrumb %}
+  <li class="breadcrumb-item"><a href="{% url 'scout:scout_home' %}">Home</a></li>
+  <li class="breadcrumb-item"><a href="{% url 'scout:matches' %}">Matches</a></li>
+  <li class="breadcrumb-item active">Match Edit</li>
+{% endblock %}
+
+{% block content %}
+<form class="form-horizontal" method="POST" action="">
+        {% csrf_token %}
+        {{ formset.management_form }}
+        <div>
+            <style>
+input {
+    width: 100%;
+    padding: 2px;
+    margin: 0px;
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+}
+select {
+    width: 100%;
+    padding: 2px;
+    margin: 0px;
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+}
+            </style>
+        <table style="table-layout: fixed; width: 100%;">
+                <thead>
+                    {% for form in formset %}
+                        {% if forloop.first %}
+                            {% for field in form %}
+                                <th>{{ field.label_tag }}</th>
+                            {% endfor %}
+                        {% endif %}
+                </thead>
+                <tbody>
+                        {% if form.errors %}
+                            <tr style="white-space: nowrap; overflow:hidden">
+                                {% for field in form %}
+                                    {% if field.errors %}
+                                    <td style="background-color:red">{{ field }}</td>
+                                    {% else %}
+                                        <td>{{ field }}</td>
+                                    {% endif %}
+                                {% endfor %}
+                            </tr>
+                        {% else %}
+                            <tr style="white-space: nowrap; overflow:hidden">
+                                {% for field in form %}
+                                    <td>{{ field }}</td>
+                                {% endfor %}
+                            </tr>
+                        {% endif %}
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="row spacer">
+            <div class="col-4 offset-2">
+                <button type="submit" class="btn btn-block btn-primary">Add Match</button>
+            </div>
+        </div>
+        {% if formset.non_form_errors %}
+            {% for error in formset.non_form_errors %}
+                {{ error|escape }}
+            {% endfor %}
+        {% endif %}
+        </form>
+
+{% endblock %}

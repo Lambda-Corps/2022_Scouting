@@ -10,7 +10,7 @@ class Team(models.Model):
     robot_report = models.OneToOneField('Robot', null=True, on_delete=models.CASCADE, related_name='team', verbose_name="Robot")
 
     def __str__(self):
-        return f"Team {self.number}: {self.name}"
+        return f"{self.number}: {self.name}"
     
 
 class Robot(models.Model):

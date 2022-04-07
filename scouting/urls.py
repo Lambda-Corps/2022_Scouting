@@ -17,7 +17,7 @@ from django.contrib import admin
 from django.urls import path,include
 from django.views.generic import RedirectView
 
-from scout.views import public_view
+from scout.views import public_view, match_preview
 
 urlpatterns = [
     path('scout/', include('scout.urls')),
@@ -25,4 +25,5 @@ urlpatterns = [
     path('', RedirectView.as_view(url='public')),
     path('public/', public_view, name='public'),
     path('accounts/', include('django.contrib.auth.urls')),
+    path('predictor/<str:type>/<int:number>', match_preview, name='match_preview')
 ]
