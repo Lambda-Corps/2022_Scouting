@@ -42,8 +42,8 @@ def update_event_teams_json():
 
 
 def get_frc_match_json():
-    url = 'https://www.thebluealliance.com/api/v3/event/2022dc320/matches/simple'
-    # url = 'https://www.thebluealliance.com/api/v3/event/2022chcmp/matches/simple'
+    # url = 'https://www.thebluealliance.com/api/v3/event/2022dc320/matches/simple'
+    url = 'https://www.thebluealliance.com/api/v3/event/2022chcmp/matches/simple'
 
     return get_event_json(url)
 
@@ -109,13 +109,15 @@ def get_team_scoring_prediction(number):
                 auto_taxi += 2
 
             if match.auto_scored > 0:
-                auto_cargo += match.auto_scored * 2 if match.auto_target is 'Low Goal' else 4
+                #auto_cargo += match.auto_scored * 2 if match.auto_target is 'Low Goal' else 4
+                auto_cargo += match.auto_scored
 
             if match.tele_low > 0:
                 teleop_cargo += match.tele_low
 
             if match.tele_high > 0:
-                teleop_cargo += match.tele_high * 2
+                #teleop_cargo += match.tele_high * 2
+                teleop_cargo += match.tele_high 
 
             if match.climb_attempted:
                 climbs_attempted += 1

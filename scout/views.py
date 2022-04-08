@@ -154,14 +154,20 @@ def match_preview(request, type, number):
 
 @login_required(login_url='/admin/login')
 def match_add(request, number):
-    matchformset = modelformset_factory(MatchResult, exclude=('id',), min_num=6, extra=0)
+
+    matches = MatchResult.objects.filter(match_number=number)
+
+    matchformset = modelformset_factory(MatchResult, exclude=('id',), min_num=matches.count(), extra=0)
 
     if request.method == 'POST':
         match_form_set = matchformset(request.POST, request.FILES)
         if match_form_set.is_valid():
             match_form_set.save()
+
+        table = MatchResultTable(MatchResult.objects.filter(match_number=number))
+        RequestConfig(request).configure(table)
+        return render(request, 'scout/match_summary.html', {'table': table})
     else:
-        matches = MatchResult.objects.filter(match_number=number)
 
         if matches.count() == 0:
             match_form_set = matchformset(queryset=MatchResult.objects.none())
